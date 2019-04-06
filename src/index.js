@@ -5,31 +5,46 @@ import './style/css/bootstrap.min.css';
 import './index.css';
 // JS Perso
 import { sampleText } from './sampleText';
+// Marked.js
+import marked from 'marked';
 
 class App extends React.Component{
 
-    state ={
+    state = {
         text: sampleText
-    }
+    };
+
+    componentWillMount(){
+        const text = localStorage.getItem('text');
+        if(text){
+            this.setState({ text });
+        }
+    };
+
+    componentWillUpdate(nextProps, nextState){
+        localStorage.setItem('text', nextState.text);
+    };
 
     editText = (event) => {
         const text = event.target.value;
-        console.log(text);
-    }
+        this.setState({ text });
+        console.log(text)
+    };
+
+    renderText = (text) => {
+        const renderText = marked(text, {sanitize: true});
+        return { __html:renderText };
+    };
 
     render(){
         return(
             <div className="container">
                 <div className="row">
                     <div className="col-sm-6">
-                        <textarea rows="35" className="form-control" value={sampleText} onchange={(e) => this.editText(e)}>
-
-                        </textarea>
+                        <textarea rows="35" className="form-control" value={sampleText} onChange={(e) => this.editText(e)}/>
                     </div>
                     <div className="col-sm-6">
-                        <div>
-                            {sampleText}
-                        </div>
+                        <div dangerouslySetInnerHTML={ this.renderText(this.state.text) }/>
                     </div>
                 </div>
             </div> 
